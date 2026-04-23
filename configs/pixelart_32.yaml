@@ -1,0 +1,42 @@
+experiment:
+  name: pixelart_32
+  seed: 42
+  output_dir: outputs/pixelart_32
+
+data:
+  root: data
+  train_metadata: data/metadata/train.jsonl
+  val_metadata: data/metadata/val.jsonl
+  image_size: 32
+  channels: 3
+  num_workers: 2
+
+model:
+  base_channels: 64
+  channel_mults: [1, 2, 2]
+  time_dim: 256
+  condition_dim: 128
+  num_classes: 512
+  dropout: 0.1
+
+diffusion:
+  timesteps: 1000
+  beta_schedule: linear
+
+training:
+  batch_size: 64
+  epochs: 20
+  learning_rate: 0.0002
+  weight_decay: 0.0
+  grad_clip: 1.0
+  log_every: 20
+  sample_every: 1
+  save_every: 1
+  sample_count: 16
+  device: auto
+
+sampling:
+  checkpoint: outputs/pixelart_32/checkpoints/latest.pt
+  prompts: ["red slime", "blue sword", "flame", "heart"]
+  num_images: 16
+  steps: 1000

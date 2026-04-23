@@ -406,3 +406,95 @@ __pycache__/
 ## 当前状态
 
 当前仓库处于项目初始化阶段。下一步建议先补充 `.gitignore`、`requirements.txt`、基础目录结构和第一个数据预处理脚本。
+
+## 快速开始
+
+当前仓库已经包含一个最小可运行框架：
+
+```text
+configs/                 # 实验配置
+data/README.md           # 数据目录说明
+scripts/prepare_data.py  # 数据预处理入口
+scripts/train.py         # 训练入口
+scripts/sample.py        # 采样入口
+scripts/evaluate.py      # 简单评估入口
+src/pixelcraft/          # 核心 Python 包
+```
+
+### 1. 安装依赖
+
+建议使用虚拟环境，避免污染服务器全局 Python：
+
+```bash
+cd /data/anqili/Pixelcraft-Diffusion
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+如果服务器已有 CUDA 环境，PyTorch 安装方式可能需要按当前 CUDA 版本调整，参考 PyTorch 官方安装命令。
+
+### 2. 准备数据
+
+把原始图片放到类似目录：
+
+```text
+data/raw/pixelart/
+  slime/red_slime_001.png
+  sword/blue_sword_001.png
+```
+
+运行预处理：
+
+```bash
+python scripts/prepare_data.py \
+  --input-dir data/raw/pixelart \
+  --output-dir data/processed \
+  --metadata-dir data/metadata \
+  --image-size 32 \
+  --source pixelart
+```
+
+该脚本会 resize 图片，并生成：
+
+```text
+data/metadata/train.jsonl
+data/metadata/val.jsonl
+```
+
+### 3. 训练 baseline
+
+```bash
+python scripts/train.py --config configs/pixelart_32.yaml
+```
+
+训练输出默认保存到：
+
+```text
+outputs/pixelart_32/
+  checkpoints/
+  samples/
+  logs/
+  config.yaml
+```
+
+### 4. 采样生成
+
+```bash
+python scripts/sample.py \
+  --config configs/pixelart_32.yaml \
+  --checkpoint outputs/pixelart_32/checkpoints/latest.pt \
+  --prompt "red slime" \
+  --num-images 16 \
+  --output outputs/demo/red_slime.png
+```
+
+### 5. 简单评估
+
+```bash
+python scripts/evaluate.py \
+  --image-dir outputs/pixelart_32/samples \
+  --output outputs/eval/pixelart_32_metrics.json
+```
+
+当前评估脚本只做 sanity check，包括图片数量、尺寸、RGB 均值和方差。后续正式实验可以继续加入 FID、KID、CLIP score 和人工偏好评估。

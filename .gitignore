@@ -1,0 +1,13 @@
+data/raw/
+data/processed/
+data/metadata/
+outputs/
+checkpoints/
+wandb/
+__pycache__/
+.ipynb_checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.pyc
+.DS_Store
